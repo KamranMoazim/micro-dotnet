@@ -19,14 +19,15 @@ namespace Play.Common.MassTransit
                 configure.UsingRabbitMq((context, configurator) =>
                 {
                     var configuration = context.GetService<IConfiguration>();
-
                     var serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
-
-
                     var rabbitMqSettings = configuration.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
+
                     configurator.Host(rabbitMqSettings.Host);
                     configurator.ConfigureEndpoints(context, new KebabCaseEndpointNameFormatter(serviceSettings.ServiceName, false));
-
+                    configurator.UseMessageRetry(retryConfigurer =>
+                    {
+                        retryConfigurer.Intervals(TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(5));
+                    });
                 });
             });
             services.AddHostedService<MassTransitHostedService>();

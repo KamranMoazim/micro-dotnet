@@ -23,11 +23,7 @@ builder.Services.AddMongo()
 
 
 
-builder.Services.AddSingleton<CatalogClient>();
-
-
-
-
+// builder.Services.AddSingleton<CatalogClient>();
 
 
 
