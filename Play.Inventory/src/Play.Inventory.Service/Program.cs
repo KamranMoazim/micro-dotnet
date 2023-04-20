@@ -1,4 +1,6 @@
+using MassTransit;
 using MongoDB.Driver.Encryption;
+using Play.Common.MassTransit;
 using Play.Common.MongoDB;
 using Play.Common.Settings;
 using Play.Inventory.Service.Clients;
@@ -15,9 +17,19 @@ var builder = WebApplication.CreateBuilder(args);
 serviceSettings = builder.Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
 
 builder.Services.AddMongo()
-    .AddMongoRepository<InventoryItem>("inventoryItem");
+    .AddMongoRepository<InventoryItem>("inventoryItem")
+    .AddMongoRepository<CatalogItem>("catalogItem")
+    .AddMassTransitWithRabbitMq();
+
+
 
 builder.Services.AddSingleton<CatalogClient>();
+
+
+
+
+
+
 
 
 builder.Services.AddHttpClient<CatalogClient>(client =>
@@ -51,11 +63,7 @@ builder.Services.AddHttpClient<CatalogClient>(client =>
     }
 ))
 .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(1));
-// .ConfigureHttpClient(_ => new HttpClientHandler
-// {
-//     ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
-// });
-// 
+
 
 
 
